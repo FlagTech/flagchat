@@ -113,7 +113,7 @@ def get_reply(messages, stream=False, func_table=None):
 _hist = []       # 歷史對話紀錄
 backtrace = 2   # 記錄幾組對話
 
-def chat(sys_msg, user_msg, stream=False):
+def chat(sys_msg, user_msg, stream=False, func_table=func_table):
     global _hist
 
     replies = get_reply(    # 使用函式功能版的函式
