@@ -4,11 +4,25 @@ from googlesearch import search
 
 __all__ = ['func_table', 'get_reply', 'chat', 'backtrace']
 
+def _google_res(user_msg, num_results=5, verbose=False):
+    content = "以下為已發生的事實：\n"                # 強調資料可信度
+    for res in search(user_msg, advanced=True,    # 一一串接搜尋結果
+                      num_results=num_results):
+        content += f"標題：{res.title}\n" \
+                    f"摘要：{res.description}\n\n"
+    content += "請依照上述事實回答以下問題：\n"        # 下達明確指令
+    if verbose:
+        print('------------')
+        print(content)
+        print('------------')
+    return content
+
 func_table = [
-    {                   # 每個元素代表一個函式
-        "chain": True,  # 函式執行結果是否要再傳回給 API
-        "spec": {       # function calling 需要的函式規格
-            "name": "_google_res",
+    {                       # 每個元素代表一個函式
+        "chain": True,      # 函式執行結果是否要再傳回給 API
+        "func": _google_res, # 函式
+        "spec": {           # function calling 需要的函式規格
+            "name": "google_res",
             "description": "取得 Google 搜尋結果",
             "parameters": {
                 "type": "object",
@@ -24,28 +38,15 @@ func_table = [
     }
 ]
 
-def _google_res(user_msg, num_results=5, verbose=False):
-    content = "以下為已發生的事實：\n"                # 強調資料可信度
-    for res in search(user_msg, advanced=True,    # 一一串接搜尋結果
-                      num_results=num_results):
-        content += f"標題：{res.title}\n" \
-                    f"摘要：{res.description}\n\n"
-    content += "請依照上述事實回答以下問題：\n"        # 下達明確指令
-    if verbose:
-        print('------------')
-        print(content)
-        print('------------')
-    return content
-
 # 從 API 傳回的 function_calling 物件中
 # 取出函式名稱與參數內容自動呼叫函式並傳回結果
 def _call_func(func_call):
     func_name = func_call['name']
-    args = func_call['arguments']
+    args = json.loads(func_call['arguments'])
     for f in func_table: # 找出包含此函式的項目
         if func_name == f['spec']['name']:
             print(f"嘗試叫用：{func_name}(**{args})")
-            val = eval(f"{func_name}(**{args})")
+            val = f['func'](**args)
             return val, f['chain']
     return '', False
 
