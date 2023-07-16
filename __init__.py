@@ -1,6 +1,6 @@
 import openai
 import json
-from googlesearch import search
+from googlesearch import search  #upm package(googlesearch-python)
 
 __all__ = ['func_table', 'get_reply', 'chat', 'backtrace']
 
