@@ -51,12 +51,15 @@ def _call_func(func_call):
     return '', False
 
 # 從 API 傳回內容找出 function_calling 內容
-def _get_func_call(messages, stream=False, func_table=None):
+def _get_func_call(messages, stream=False, func_table=None, 
+                  **kwargs):
+    model = 'gpt-3.5-turbo'
+    if 'model' in kwargs: model = kwargs['model']
     funcs = {}
     if func_table:
         funcs = {'functions':[f['spec'] for f in func_table]}
     response = openai.ChatCompletion.create(
-        model = "gpt-3.5-turbo",
+        model = model,
         messages = messages,
         stream = stream,
         **funcs
@@ -79,10 +82,12 @@ def _get_func_call(messages, stream=False, func_table=None):
             return msg['function_call'], None
     return None, response
 
-def get_reply(messages, stream=False, func_table=None):
+def get_reply(messages, stream=False, func_table=None, 
+                **kwargs):
     try:
         func_call, response = _get_func_call(messages,
-                                            stream, func_table)
+                                            stream, func_table,
+                                            **kwargs)
         if func_call:
             res, chain = _call_func(func_call)
             if chain:  # 如果需要將函式執行結果送回給 AI 再回覆
@@ -97,7 +102,8 @@ def get_reply(messages, stream=False, func_table=None):
                         "name": func_call['name'], # 傳回函式名名稱
                         "content": res             # 傳回執行結果
                     }]
-                yield from get_reply(messages, stream, None)
+                yield from get_reply(messages, stream, None, 
+                                     **kwargs)
             else:
                 yield res
         elif stream:
@@ -114,14 +120,15 @@ def get_reply(messages, stream=False, func_table=None):
 _hist = []       # 歷史對話紀錄
 backtrace = 2   # 記錄幾組對話
 
-def chat(sys_msg, user_msg, stream=False, func_table=func_table):
+def chat(sys_msg, user_msg, stream=False, func_table=func_table, 
+         **kwargs):
     global _hist
 
     replies = get_reply(    # 使用函式功能版的函式
         _hist                          # 先提供歷史紀錄
         + [{"role": "user", "content": user_msg}]
         + [{"role": "system", "content": sys_msg}],
-        stream, func_table)
+        stream, func_table, **kwargs)
     reply_full = ''
     for reply in replies:
         reply_full += reply
