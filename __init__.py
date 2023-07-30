@@ -2,7 +2,7 @@ import openai
 import json
 from googlesearch import search  #upm package(googlesearch-python)
 
-__all__ = ['func_table', 'get_reply', 'chat', 'backtrace']
+__all__ = ['func_table', 'get_reply', 'chat', 'backtrace', 'empty_history']
 
 def _google_res(user_msg, num_results=5, verbose=False):
     content = "以下為已發生的事實：\n"                # 強調資料可信度
@@ -148,3 +148,6 @@ def chat(sys_msg, user_msg, stream=False, func_table=func_table,
     ]
     while len(_hist) >= 2 * backtrace: # 超過記錄限制
         _hist.pop(0)  # 移除最舊的紀錄
+
+def empty_history():
+    _hist.clear()
