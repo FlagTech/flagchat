@@ -59,9 +59,10 @@ def _get_func_call(messages, stream=False, func_table=None,
     if debug:
         print('\n--------------')
         print(f'model:{model}')
-        print('function table:')
-        for func in func_table:
-            print(f"\t{func['spec']['name']}")
+        if func_table:
+            print('function table:')
+            for func in func_table:
+                print(f"\t{func['spec']['name']}")
         print('messages:')
         for msg in messages:
             print(f"\t{msg}")
@@ -114,7 +115,7 @@ def get_reply(messages, stream=False, func_table=None,
                         "name": func_call['name'], # 傳回函式名名稱
                         "content": res             # 傳回執行結果
                     }]
-                yield from get_reply(messages, stream, None, 
+                yield from get_reply(messages, stream, func_table, 
                                      **kwargs)
             else:
                 yield res
