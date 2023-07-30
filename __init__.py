@@ -57,7 +57,7 @@ def _get_func_call(messages, stream=False, func_table=None,
     debug = kwargs.get('debug', False)
 
     if debug:
-        print('--------------')
+        print('\n--------------')
         print(f'model:{model}')
         for msg in messages:
             print(msg)
