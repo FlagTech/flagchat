@@ -53,9 +53,7 @@ def _call_func(func_call):
 # 從 API 傳回內容找出 function_calling 內容
 def _get_func_call(messages, stream=False, func_table=None, 
                   **kwargs):
-    model = 'gpt-3.5-turbo'
-    if 'model' in kwargs: model = kwargs['model']
-
+    model = kwargs.get('model', 'gpt-3.5-turbo')
     debug = kwargs.get('debug', False)
     if debug:
         for msg in messages:
