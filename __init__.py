@@ -132,25 +132,37 @@ def get_reply(messages, stream=False, func_table=None,
 
 _hist = []       # 歷史對話紀錄
 backtrace = 2   # 記錄幾組對話
+_verify_msg = {
+    "role": "user",
+    "content": "如果剛剛的回答內容確實已經回答了所有問題, "
+               "請回覆 'Y', 否則回覆 'N', 只要單一字母,"
+               " 不要加任何其他說明"
+}
 
 def chat(sys_msg, user_msg, stream=False, func_table=func_table, 
          **kwargs):
     global _hist
+    verify = kwargs.get('verify', False)
+    while True:
+        replies = get_reply(    # 使用函式功能版的函式
+            _hist                          # 先提供歷史紀錄
+            + [{"role": "user", "content": user_msg}]
+            + [{"role": "system", "content": sys_msg}],
+            stream, func_table, **kwargs)
+        reply_full = ''
+        for reply in replies:
+            reply_full += reply
+            yield reply
 
-    replies = get_reply(    # 使用函式功能版的函式
-        _hist                          # 先提供歷史紀錄
-        + [{"role": "user", "content": user_msg}]
-        + [{"role": "system", "content": sys_msg}],
-        stream, func_table, **kwargs)
-    reply_full = ''
-    for reply in replies:
-        reply_full += reply
-        yield reply
-
-    _hist += [
-        {"role":"user", "content":user_msg},
-        {"role":"assistant", "content":reply_full}
-    ]
+        _hist += [
+            {"role":"user", "content":user_msg},
+            {"role":"assistant", "content":reply_full}
+        ]
+        if not verify: break
+        for reply in get_reply(_hist + [_verify_msg]):pass
+        print(f"已完成：{reply}")
+        if reply=='Y': break
+        user_msg = '繼續'
     while len(_hist) >= 2 * backtrace: # 超過記錄限制
         _hist.pop(0)  # 移除最舊的紀錄
 
