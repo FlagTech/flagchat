@@ -55,7 +55,9 @@ def _get_func_call(messages, stream=False, func_table=None,
                   **kwargs):
     model = kwargs.get('model', 'gpt-3.5-turbo')
     debug = kwargs.get('debug', False)
+
     if debug:
+        print(f'model:{model}')
         for msg in messages:
             print(msg)
 
