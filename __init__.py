@@ -1,6 +1,7 @@
 import openai
 import json
 from googlesearch import search  #upm package(googlesearch-python)
+import logging
 
 __all__ = ['func_table', 'get_reply', 'chat', 'backtrace', 'empty_history']
 
@@ -12,9 +13,9 @@ def _google_res(user_msg, num_results=5, verbose=False):
                     f"摘要：{res.description}\n\n"
     content += "請依照上述事實回答以下問題：\n"        # 下達明確指令
     if verbose:
-        print('------------')
-        print(content)
-        print('------------')
+        logging.debug('------------')
+        logging.debug(content)
+        logging.debug('------------')
     return content
 
 func_table = [
@@ -57,16 +58,16 @@ def _get_func_call(messages, stream=False, func_table=None,
     debug = kwargs.get('debug', False)
 
     if debug:
-        print('\n--------------')
-        print(f'model:{model}')
+        logging.debug('\n--------------')
+        logging.debug(f'model:{model}')
         if func_table:
-            print('function table:')
+            logging.debug('function table:')
             for func in func_table:
-                print(f"\t{func['spec']['name']}")
-        print('messages:')
+                logging.debug(f"\t{func['spec']['name']}")
+        logging.debug('messages:')
         for msg in messages:
-            print(f"\t{msg}")
-        print('--------------')
+            logging.debug(f"\t{msg}")
+        logging.debug('--------------')
 
     funcs = {}
     if func_table:
@@ -127,7 +128,7 @@ def get_reply(messages, stream=False, func_table=None,
             yield response['choices'][0]['message']['content']
     except openai.OpenAIError as err:
         reply = f"發生 {err.error.type} 錯誤\n{err.error.message}"
-        print(reply)
+        logging.debug(reply)
         yield reply
 
 _hist = []       # 歷史對話紀錄
