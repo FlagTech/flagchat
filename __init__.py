@@ -61,10 +61,10 @@ def _get_func_call(messages, stream=False, func_table=None,
         print(f'model:{model}')
         print('function table:')
         for func in func_table:
-            print(func['spec']['name'])
+            print(f"\t{func['spec']['name']}")
         print('messages:')
         for msg in messages:
-            print(msg)
+            print(f"\t{msg}")
         print('--------------')
 
     funcs = {}
