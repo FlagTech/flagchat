@@ -1,7 +1,6 @@
 import openai
 import json
 from googlesearch import search  #upm package(googlesearch-python)
-import logging
 
 __all__ = ['func_table', 'get_reply', 'chat', 'backtrace', 'empty_history']
 
@@ -13,9 +12,9 @@ def _google_res(user_msg, num_results=5, verbose=False):
                     f"摘要：{res.description}\n\n"
     content += "請依照上述事實回答以下問題：\n"        # 下達明確指令
     if verbose:
-        logging.info('------------')
-        logging.info(content)
-        logging.info('------------')
+        print('------------')
+        print(content)
+        print('------------')
     return content
 
 func_table = [
@@ -39,12 +38,6 @@ func_table = [
     }
 ]
 
-import logging
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('flagchat')
-logger.setLevel(logging.INFO)
-
 # 從 API 傳回的 function_calling 物件中
 # 取出函式名稱與參數內容自動呼叫函式並傳回結果
 def _call_func(func_call):
@@ -64,16 +57,16 @@ def _get_func_call(messages, stream=False, func_table=None,
     debug = kwargs.get('debug', False)
 
     if debug:
-        logging.info('\n--------------')
-        logging.info(f'model:{model}')
+        print('\n--------------')
+        print(f'model:{model}')
         if func_table:
-            logging.info('function table:')
+            print('function table:')
             for func in func_table:
-                logging.info(f"\t{func['spec']['name']}")
-        logging.info('messages:')
+                print(f"\t{func['spec']['name']}")
+        print('messages:')
         for msg in messages:
-            logging.info(f"\t{msg}")
-        logging.info('--------------')
+            print(f"\t{msg}")
+        print('--------------')
 
     funcs = {}
     if func_table:
@@ -134,7 +127,7 @@ def get_reply(messages, stream=False, func_table=None,
             yield response['choices'][0]['message']['content']
     except openai.OpenAIError as err:
         reply = f"發生 {err.error.type} 錯誤\n{err.error.message}"
-        logging.info(reply)
+        print(reply)
         yield reply
 
 _hist = []       # 歷史對話紀錄
