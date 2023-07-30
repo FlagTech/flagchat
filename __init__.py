@@ -13,9 +13,9 @@ def _google_res(user_msg, num_results=5, verbose=False):
                     f"摘要：{res.description}\n\n"
     content += "請依照上述事實回答以下問題：\n"        # 下達明確指令
     if verbose:
-        logging.debug('------------')
-        logging.debug(content)
-        logging.debug('------------')
+        logging.info('------------')
+        logging.info(content)
+        logging.info('------------')
     return content
 
 func_table = [
@@ -39,6 +39,12 @@ func_table = [
     }
 ]
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('flagchat')
+logger.setLevel(logging.INFO)
+
 # 從 API 傳回的 function_calling 物件中
 # 取出函式名稱與參數內容自動呼叫函式並傳回結果
 def _call_func(func_call):
@@ -58,16 +64,16 @@ def _get_func_call(messages, stream=False, func_table=None,
     debug = kwargs.get('debug', False)
 
     if debug:
-        logging.debug('\n--------------')
-        logging.debug(f'model:{model}')
+        logging.info('\n--------------')
+        logging.info(f'model:{model}')
         if func_table:
-            logging.debug('function table:')
+            logging.info('function table:')
             for func in func_table:
-                logging.debug(f"\t{func['spec']['name']}")
-        logging.debug('messages:')
+                logging.info(f"\t{func['spec']['name']}")
+        logging.info('messages:')
         for msg in messages:
-            logging.debug(f"\t{msg}")
-        logging.debug('--------------')
+            logging.info(f"\t{msg}")
+        logging.info('--------------')
 
     funcs = {}
     if func_table:
@@ -128,7 +134,7 @@ def get_reply(messages, stream=False, func_table=None,
             yield response['choices'][0]['message']['content']
     except openai.OpenAIError as err:
         reply = f"發生 {err.error.type} 錯誤\n{err.error.message}"
-        logging.debug(reply)
+        logging.info(reply)
         yield reply
 
 _hist = []       # 歷史對話紀錄
