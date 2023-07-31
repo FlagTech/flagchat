@@ -163,7 +163,7 @@ def chat(sys_msg, user_msg, stream=False, func_table=func_table,
         ]
         if not verify or depth == _verify_depth: break
         for reply in get_reply(_hist + [_verify_msg]):pass
-        print(f"已完成：{reply}")
+        print(f"(已完成：{reply})")
         if reply=='Y': break
         user_msg = '繼續'
         depth += 1
