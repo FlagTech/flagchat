@@ -3,7 +3,7 @@ import json
 from googlesearch import search  #upm package(googlesearch-python)
 
 __all__ = ['func_table', 'get_reply', 'chat', 
-           'backtrace', 'empty_history', 'verify_depth']
+           'set_backtrace', 'empty_history', 'set_verify_depth']
 
 def _google_res(user_msg, num_results=5, verbose=False):
     content = "以下為已發生的事實：\n"                # 強調資料可信度
