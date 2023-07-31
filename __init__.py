@@ -132,8 +132,8 @@ def get_reply(messages, stream=False, func_table=None,
         yield reply
 
 _hist = []       # 歷史對話紀錄
-backtrace = 2   # 記錄幾組對話
-verify_depth = 3 # 最多驗證 3 次
+_backtrace = 2   # 記錄幾組對話
+_verify_depth = 3 # 最多驗證 3 次
 _verify_msg = {
     "role": "user",
     "content": "如果之前是問句, 且剛剛的回答內容確實已經回答了問題, "
@@ -172,3 +172,15 @@ def chat(sys_msg, user_msg, stream=False, func_table=func_table,
 
 def empty_history():
     _hist.clear()
+
+def set_backtrace(backtrace=0):
+    global _backtrace
+    if backtrace > 0:
+        _backtrace = backtrace
+    return _backtrace
+
+def set_verify_depth(verify_depyh = 0):
+    global _verify_depth
+    if verify_depyh > 0:
+        _verify_depth = verify_depyh
+    return _verify_depth
