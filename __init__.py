@@ -2,7 +2,8 @@ import openai
 import json
 from googlesearch import search  #upm package(googlesearch-python)
 
-__all__ = ['func_table', 'get_reply', 'chat', 'backtrace', 'empty_history']
+__all__ = ['func_table', 'get_reply', 'chat', 
+           'backtrace', 'empty_history', 'verify_depth']
 
 def _google_res(user_msg, num_results=5, verbose=False):
     content = "以下為已發生的事實：\n"                # 強調資料可信度
@@ -132,9 +133,10 @@ def get_reply(messages, stream=False, func_table=None,
 
 _hist = []       # 歷史對話紀錄
 backtrace = 2   # 記錄幾組對話
+verify_depth = 3 # 最多驗證 3 次
 _verify_msg = {
     "role": "user",
-    "content": "如果剛剛的回答內容確實已經回答了所有問題, "
+    "content": "如果之前是問句, 且剛剛的回答內容確實已經回答了問題, "
                "請回覆 'Y', 否則回覆 'N', 只要單一字母,"
                " 不要加任何其他說明"
 }
@@ -143,6 +145,7 @@ def chat(sys_msg, user_msg, stream=False, func_table=func_table,
          **kwargs):
     global _hist
     verify = kwargs.get('verify', False)
+    depth = 0
     while True:
         replies = get_reply(    # 使用函式功能版的函式
             _hist                          # 先提供歷史紀錄
@@ -158,11 +161,12 @@ def chat(sys_msg, user_msg, stream=False, func_table=func_table,
             {"role":"user", "content":user_msg},
             {"role":"assistant", "content":reply_full}
         ]
-        if not verify: break
+        if not verify or depth == verify_depth: break
         for reply in get_reply(_hist + [_verify_msg]):pass
         print(f"已完成：{reply}")
         if reply=='Y': break
         user_msg = '繼續'
+        depth += 1
     while len(_hist) >= 2 * backtrace: # 超過記錄限制
         _hist.pop(0)  # 移除最舊的紀錄
 
