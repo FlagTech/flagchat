@@ -161,13 +161,13 @@ def chat(sys_msg, user_msg, stream=False, func_table=func_table,
             {"role":"user", "content":user_msg},
             {"role":"assistant", "content":reply_full}
         ]
-        if not verify or depth == verify_depth: break
+        if not verify or depth == _verify_depth: break
         for reply in get_reply(_hist + [_verify_msg]):pass
         print(f"已完成：{reply}")
         if reply=='Y': break
         user_msg = '繼續'
         depth += 1
-    while len(_hist) >= 2 * backtrace: # 超過記錄限制
+    while len(_hist) >= 2 * _backtrace: # 超過記錄限制
         _hist.pop(0)  # 移除最舊的紀錄
 
 def empty_history():
